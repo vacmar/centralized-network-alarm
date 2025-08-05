@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
+import '../models/sensor_data.dart';
+import '../utils/alert_sound_player.dart';
 
-class StudentAlertScreen extends StatelessWidget {
+class DashboardScreen extends StatelessWidget {
   final String customAlert;
+  final List<SensorData> sensorDataList;
 
-  const StudentAlertScreen({super.key, this.customAlert = ''});
-  
+  const DashboardScreen({
+    super.key,
+    this.customAlert = '',
+    required this.sensorDataList,
+  });
+
   @override
   Widget build(BuildContext context) {
-    final sensorData = [
-      {
-        'label': 'Temperature & Humidity',
-        'status': 'Normal',
-        'value': '28°C / 60%',
-      },
-      {'label': 'Smoke (MQ-6)', 'status': 'Normal', 'value': 'Safe'},
-      {
-        'label': 'Flame Sensor',
-        'status': 'Danger',
-        'value': '🔥 Flame Detected!',
-      },
-    ];
+    final alertPlayer = AlertSoundPlayer();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final hasDanger = sensorDataList.any(
+        (sensor) => sensor.status == 'Danger',
+      );
+      if (hasDanger) {
+        alertPlayer.playAlertSound();
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text(
-          'Student View',
+          'Dashboard',
           style: TextStyle(fontFamily: 'monospace', color: Colors.white),
         ),
       ),
@@ -55,23 +59,26 @@ class StudentAlertScreen extends StatelessWidget {
               ),
             Expanded(
               child: ListView.separated(
-                itemCount: sensorData.length,
+                itemCount: sensorDataList.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
-                  final sensor = sensorData[index];
-                  final isDanger = sensor['status'] == 'Danger';
+                  final sensor = sensorDataList[index];
+                  final isDanger = sensor.status == 'Danger';
 
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDanger ? Colors.red.shade100 : Colors.green.shade100,
+                      color:
+                          isDanger
+                              ? Colors.red.shade100
+                              : Colors.green.shade100,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          sensor['label']!,
+                          sensor.sensor,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -80,7 +87,7 @@ class StudentAlertScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          sensor['value']!,
+                          sensor.value,
                           style: const TextStyle(
                             fontSize: 14,
                             fontFamily: 'monospace',
@@ -88,7 +95,7 @@ class StudentAlertScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Status: ${sensor['status']}',
+                          'Status: ${sensor.status}',
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'monospace',
