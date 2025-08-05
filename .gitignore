@@ -1,0 +1,27 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub-cache/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+
+# Generated files
+**/*.g.dart
+*.lock
+*.iml
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Firebase
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
